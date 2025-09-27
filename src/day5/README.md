@@ -1,26 +1,22 @@
-# Vector Add with a twist
+# Matmul with tiling, shared memory, and timings
 
-The inspiration for this code came from the following question from PMPP
-https://github.com/R100001/Programming-Massively-Parallel-Processors/blob/master/Chapters/Ch02%20-%20Data%20Parallel%20Computing/exercises/README.md
+Followup to day4
 
+We implement matmul two ways - once with shared memory and the other without
 
-2. Assume that we want to use each thread to calculate two (adjacent) elements of a vector addition. What would be the expression for mapping the thread/block indices to i, the data index of the first element to be processed by a thread?
+Timing results for Nvidia Titan V
 
-        A. i=blockIdx.x*blockDim.x + threadIdx.x +2;
-        B. i=blockIdx.xthreadIdx.x2;
-        C. i=(blockIdx.x*blockDim.x + threadIdx.x)*2;
-        D. i=blockIdx.xblockDim.x2 + threadIdx.x;
-        Correct answer: C
+Running in FUNCTIONAL mode...
+Compiling...
+Executing...
+TILE=32  grid=(1,1) block=(32,32)
+Avg kernel time  naive: 0.253 ms
+Avg kernel time tiled: 0.006 ms
+Exit status: 0
 
-The problem assumes that by adjacent, they mean there are 2 independent elements in the data array from each thread
+However, for most of the other GPUs, the non-shared memory version was still faster.
 
-i.e thread 1 -> data1 + data2, thread 2 => data3 + data4
+Also, problem size constrained to 256 x 256 x 256, otherwise LeetGPU timed out
+TILE of 32 x 32 seemed to work best.
 
-But I had intepreted the question as
-
-thread 1 -> data1 + data2, thread2 -> data2 + data3
-
-So the answer for me would have been i=(blockIdx.x*blockDim.x + threadIdx.x) + 1
-
-In any case, this would make the data mapping a little trickier because you have to make sure the data is there for two threads intead of for one thread ( thread 1 and thread 2 depend on data2 being there ).  Hence the use of __syncthreads()
 
