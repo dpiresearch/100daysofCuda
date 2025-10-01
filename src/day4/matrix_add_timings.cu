@@ -6,34 +6,39 @@ __global__ void matrixAdd_1D(float *A, float *B, float *C, int m, int n) {
 
 
     const int total = m * n;
+    int idx = blockIdx.x * blockDim.x + threadIdx.x;
 
+    if (idx < total) {
+        C[idx] = A[idx] + B[idx];
+    }
     //if (dataidx < total) {
     //    shared_A[threadIdx.x][threadIdx.y] = A[dataidx];
     //}
 
     //__syncthreads();
-    for (int i = 0; i < total; i++) {
-        C[i] = A[i] + B[i];
-    }
+    // for (int i = 0; i < total; i++) {
+    //     C[i] = A[i] + B[i];
+    // }
 }
 
 __global__ void matrixAdd_1D_shared(float *A, float *B, float *C, int m, int n) {
 
     const int total = m*n;
 
-    extern __shared__ float shared_data_A[];
-    extern __shared__ float shared_data_B[];
+    extern __shared__ float shared_data[];
 
-    for (int idx = 0; idx < total; idx++) {
-        shared_data_A[idx] = A[idx];
-        shared_data_B[idx] = B[idx];
+    int idx = blockIdx.x * blockDim.x + threadIdx.x;
+    
+    if (idx < total ) {
+        shared_data[threadIdx.x] = A[idx];
     }
 
     __syncthreads();
 
-    for (int idx = 0; idx < total; idx++) {
-        C[idx] = shared_data_A[idx] + shared_data_B[idx];
+    if (idx < total) {
+        C[idx] = shared_data[threadIdx.x] + B[idx];
     }
+
 
         
 }

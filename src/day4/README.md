@@ -16,4 +16,10 @@ Exit status: 0
 -- questions --
 Why did shared mem take longer here?
 
+Ans: There were many problems with this impl
+
+1. Threads not taking advantage of shared memory
+2. Each thread operated on the entire dataset.
+3. Shared memory allocation too large.
+
 
